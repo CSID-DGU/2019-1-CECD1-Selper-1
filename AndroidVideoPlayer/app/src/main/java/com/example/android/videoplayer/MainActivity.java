@@ -57,11 +57,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         //동영상이 재생준비가 완료되었을 때를 알 수 있는 리스너 (실제 웹에서 영상을 다운받아 출력할 때 많이 사용됨)
+        //커밋 실험용
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 Toast.makeText(MainActivity.this,
-                        "동영상이 준비되었습니다. \n시작 버튼을 누르세요", Toast.LENGTH_SHORT).show();
+                        "동영상이 준비되었습니다. \n'시작' 버튼을 누르세요", Toast.LENGTH_SHORT).show();
             }
         });
 
