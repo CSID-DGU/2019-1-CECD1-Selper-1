@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 Toast.makeText(MainActivity.this,
-                        "동영상이 준비되었습니다. \n'시작' 버튼을 누르세요", Toast.LENGTH_SHORT).show();
+                        "동영상이 준비되었습니다. \n시작 버튼을 누르세요", Toast.LENGTH_SHORT).show();
             }
         });
 
