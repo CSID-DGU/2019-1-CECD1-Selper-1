@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
-
+//커밋김연준
 public class MainActivity extends AppCompatActivity {
 
     public final static String VIDEO_URL = "http://sites.google.com/site/ubiaccessmobile/sample_video.mp4";
