@@ -1,21 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context="com.example.android.videoplayer.MainActivity"
+    android:orientation="vertical"
     android:weightSum="1">
 
-    <VideoView
-        android:id="@+id/videoView"
-        android:layout_width="384dp"
-        android:layout_height="wrap_content" />
-
-    <VideoView
-        android:id="@+id/view"
+    <ImageView
+        android:id="@+id/mainlogo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/mainlogo"
+        android:layout_weight="0.74" />
 
+    <Button
+        android:id="@+id/playguidevideobtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_gravity="center"
+        android:onClick="loadVideofromGallery"
+        android:text="Play Guide Video"/>
+
+    <Button
+        android:id="@+id/downloadvideobtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_gravity="center"
+        android:text="Download Video"/>
+
+    <Button
+        android:id="@+id/comparevideobtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="10dp"
+        android:text="Compare Video" />
 </LinearLayout>
