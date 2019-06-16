@@ -1,13 +1,13 @@
 # 2019-1-CECD1-Selper-1
 # HumanSegmentation
 
-#Using Mask R-CNN
+# Using Mask R-CNN
 
-#Change file
+# Change file
 1. model.py
 2. visualize.py
 
-#License
+# License
 Mask R-CNN
 
 The MIT License (MIT)
