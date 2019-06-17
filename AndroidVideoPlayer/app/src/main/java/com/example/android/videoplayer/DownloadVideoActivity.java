@@ -1,51 +1,55 @@
 package com.example.android.videoplayer;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class GetVideoActivity extends Activity {
+public class DownloadVideoActivity extends Activity {
     private ArrayList<CommonData> arrayList;
     private ListView fileList;
     private GroupAdapter adapter;
 
-    public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
+    Button download;
+
+    int prg = 0;
+    LinearLayout ll;
+    ProgressBar progressBar;
+    TextView tvText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_video);
-
-        if (checkPermissionREAD_EXTERNAL_STORAGE(this)) {
-            makeFileList();
-        }
-
+        setContentView(R.layout.activity_download_video);
+        download = (Button)findViewById(R.id.downloadbtn);
+        makeFileList();
     }
 
     public ArrayList<CommonData> mGetBVideoList() {
@@ -102,9 +106,13 @@ public class GetVideoActivity extends Activity {
                 CommonData item = arrayList.get(position);
                 File file = new File(item.mVideoFilePath);
                 if(file.isFile() && file.canRead()) {
-                    Intent intent = new Intent(getApplicationContext(), PlayVideoActivity.class);
-                    intent.putExtra("FilePath", item.mVideoFilePath);
-                    startActivity(intent);
+
+                    download.setOnClickListener(new View.OnClickListener(){
+
+                        public void onClick(View view){
+                            showDownloadDialog();
+                        }
+                    });
                 }
             }
         });
@@ -153,67 +161,120 @@ public class GetVideoActivity extends Activity {
         return hours + ":" + minutes + ":" + seconds;
     }
 
-    public boolean checkPermissionREAD_EXTERNAL_STORAGE(
-            final Context context) {
-        int currentAPIVersion = Build.VERSION.SDK_INT;
-        if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        (Activity) context,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    showDialog("External storage", context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE);
+    public void showDownloadDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Ghost Video");
+        builder.setMessage("선택한 가이드 영상을 Ghost Video로 생성하시겠습니까?");
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
 
-                } else {
-                    ActivityCompat
-                            .requestPermissions(
-                                    (Activity) context,
-                                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                setProgressDialog();
+                new Thread(myThread).start();
+                if (tvText.getText().equals("Finished")) {
+
+
                 }
-                return false;
-            } else {
-                return true;
+            }
+        });
+
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+    public void setProgressDialog() {
+        int llPadding = 30;
+        ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.HORIZONTAL);
+        ll.setPadding(llPadding, llPadding, llPadding, llPadding);
+        ll.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams llParam = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        llParam.gravity = Gravity.CENTER;
+        ll.setLayoutParams(llParam);
+
+        progressBar = new ProgressBar(this);
+        progressBar.setIndeterminate(true);
+        progressBar.setPadding(0, 0, llPadding, 0);
+        progressBar.setLayoutParams(llParam);
+        progressBar.setProgress(prg);
+
+        llParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        llParam.gravity = Gravity.CENTER;
+        tvText = new TextView(this);
+        tvText.setText("Loading ...");
+        tvText.setTextColor(Color.parseColor("#000000"));
+        tvText.setTextSize(20);
+        tvText.setLayoutParams(llParam);
+
+        ll.addView(progressBar);
+        ll.addView(tvText);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setView(ll);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        /*Window window = dialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            layoutParams.copyFrom(dialog.getWindow().getAttributes());
+            layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            dialog.getWindow().setAttributes(layoutParams);
+        }*/
+    }
+
+    private Runnable myThread = new Runnable()
+    {
+        private boolean flag = true;
+
+        @Override
+        public void run()
+        {
+            while (prg < 100)
+            {
+                try
+                {
+                    hnd.sendMessage(hnd.obtainMessage());
+                    Thread.sleep(100);
+                }
+                catch(InterruptedException e)
+                {
+                    Log.e("ERROR", "Thread was Interrupted");
+                }
             }
 
-        } else {
-            return true;
-        }
-    }
-
-    public void showDialog(final String msg, final Context context,
-                           final String permission) {
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
-        alertBuilder.setCancelable(true);
-        alertBuilder.setTitle("Permission necessary");
-        alertBuilder.setMessage(msg + " permission is necessary");
-        alertBuilder.setPositiveButton(android.R.string.yes,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions((Activity) context,
-                                new String[] { permission },
-                                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    }
-                });
-        AlertDialog alert = alertBuilder.create();
-        alert.show();
-    }
-
-    /*public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // do your stuff
-                } else {
-                    Toast.makeText(Login.this, "GET_ACCOUNTS Denied",
-                            Toast.LENGTH_SHORT).show();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    tvText.setText("Finished");
+                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                    startActivity(intent);
                 }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions,
-                        grantResults);
+            });
         }
-    }*/
+
+        Handler hnd = new Handler()
+        {
+            @Override
+            public void handleMessage(Message msg)
+            {
+                prg++;
+                progressBar.setProgress(prg);
+
+                String perc = String.valueOf(prg).toString();
+                tvText.setText(perc+"% completed");
+            }
+        };
+    };
 }

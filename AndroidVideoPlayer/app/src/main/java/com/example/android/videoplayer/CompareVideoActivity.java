@@ -1,28 +1,24 @@
 package com.example.android.videoplayer;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,22 +26,19 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-public class GetVideoActivity extends Activity {
+public class CompareVideoActivity extends Activity {
     private ArrayList<CommonData> arrayList;
     private ListView fileList;
     private GroupAdapter adapter;
 
-    public static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 123;
+    Button download;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_video);
-
-        if (checkPermissionREAD_EXTERNAL_STORAGE(this)) {
-            makeFileList();
-        }
-
+        setContentView(R.layout.activity_download_video);
+        download = (Button)findViewById(R.id.downloadbtn);
+        makeFileList();
     }
 
     public ArrayList<CommonData> mGetBVideoList() {
@@ -61,7 +54,7 @@ public class GetVideoActivity extends Activity {
                 MediaStore.Video.Media.DATE_ADDED,
                 MediaStore.Video.Media.RESOLUTION
         };
-        mVideoCursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, proj, "bucket_display_name='guide'", null, null);
+        mVideoCursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, proj, "bucket_display_name='preghost'", null, null);
         if(mVideoCursor.moveToFirst()) {
             int id = mVideoCursor.getColumnIndex(MediaStore.Video.Media._ID);
             int size = mVideoCursor.getColumnIndex(MediaStore.Video.Media.SIZE);
@@ -102,9 +95,13 @@ public class GetVideoActivity extends Activity {
                 CommonData item = arrayList.get(position);
                 File file = new File(item.mVideoFilePath);
                 if(file.isFile() && file.canRead()) {
-                    Intent intent = new Intent(getApplicationContext(), PlayVideoActivity.class);
-                    intent.putExtra("FilePath", item.mVideoFilePath);
-                    startActivity(intent);
+
+                    download.setOnClickListener(new View.OnClickListener(){
+
+                        public void onClick(View view){
+                            showDownloadDialog();
+                        }
+                    });
                 }
             }
         });
@@ -153,67 +150,28 @@ public class GetVideoActivity extends Activity {
         return hours + ":" + minutes + ":" + seconds;
     }
 
-    public boolean checkPermissionREAD_EXTERNAL_STORAGE(
-            final Context context) {
-        int currentAPIVersion = Build.VERSION.SDK_INT;
-        if (currentAPIVersion >= android.os.Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context,
-                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        (Activity) context,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    showDialog("External storage", context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE);
+    public void showDownloadDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("User Video");
+        builder.setMessage("선택한 영상을 User Video로 하시겠습니까?");
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
 
-                } else {
-                    ActivityCompat
-                            .requestPermissions(
-                                    (Activity) context,
-                                    new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-                                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                }
-                return false;
-            } else {
-                return true;
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(getApplicationContext(),CompareVideo2Activity.class);
+                startActivity(intent);
             }
+        });
 
-        } else {
-            return true;
-        }
+        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
-
-    public void showDialog(final String msg, final Context context,
-                           final String permission) {
-        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
-        alertBuilder.setCancelable(true);
-        alertBuilder.setTitle("Permission necessary");
-        alertBuilder.setMessage(msg + " permission is necessary");
-        alertBuilder.setPositiveButton(android.R.string.yes,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions((Activity) context,
-                                new String[] { permission },
-                                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    }
-                });
-        AlertDialog alert = alertBuilder.create();
-        alert.show();
-    }
-
-    /*public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // do your stuff
-                } else {
-                    Toast.makeText(Login.this, "GET_ACCOUNTS Denied",
-                            Toast.LENGTH_SHORT).show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions,
-                        grantResults);
-        }
-    }*/
 }

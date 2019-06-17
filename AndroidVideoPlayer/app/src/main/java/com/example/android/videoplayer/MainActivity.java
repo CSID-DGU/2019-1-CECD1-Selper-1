@@ -14,10 +14,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button btn1 = (Button) findViewById(R.id.playguidevideobtn);
+        Button btn2 = (Button) findViewById(R.id.downloadvideobtn);
+        Button btn3 = (Button) findViewById(R.id.comparevideobtn);
         btn1.setOnClickListener(new View.OnClickListener(){
 
             public void onClick(View view){
                 Intent intent = new Intent(getApplicationContext(),GetVideoActivity.class);
+                startActivity(intent);
+            }
+        });
+        btn2.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View view){
+                Intent intent = new Intent(getApplicationContext(),DownloadVideoActivity.class);
+                startActivity(intent);
+            }
+        });
+        btn3.setOnClickListener(new View.OnClickListener(){
+
+            public void onClick(View view){
+                Intent intent = new Intent(getApplicationContext(),CompareVideoActivity.class);
                 startActivity(intent);
             }
         });
