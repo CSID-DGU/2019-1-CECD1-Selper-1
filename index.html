@@ -29,6 +29,18 @@
   <!-- bower:css -->
   <!-- endbower -->
 
+  <!-- Add source -->
+  <!-- responsivevoice.js-->
+  <script src="http://code.responsivevoice.org/responsivevoice.js"></script>
+  <script type="text/javascript">
+    function say(){
+      if(responsiveVoice.voiceSupport()){
+        console.log("Responsive Voice Supported");
+        responsiveVoice.speak("Babo","Korean Female");
+      }
+    }
+  </script>
+
 </head>
 
 <body ng-controller="MirrorCtrl" ng-cloak>
@@ -47,6 +59,7 @@
     </div>
   </div>
   <div class="container" ng-class="(listening == true)?'listening':'not-listening'">
+    <button onclick="say();">Speak</button>
     <div class="middle-center">
       <h1 ng-controller="Greeting" ng-bind="greeting" ng-cloak></h1>
       <div ng-include="'plugins/remote/index.html'"></div>
