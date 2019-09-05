@@ -170,15 +170,27 @@
 
 			SpeechService.addCommand('play_video',function(){
 				console.debug("가이드 영상을 재생합니다");
-				$.ajax({
+				var csrf_token = "YrBQxfk6cyAlKqAigDhXJkHaMiwaqvnDktDq2lqP4b1vUcKjdo8tXoKrjBlnt5NG";
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET","http://0.0.0.0:9123/data?key=1",true);
+				xhr.send(null);
+				/*$.ajax({
 					type: "POST",
-					url: "~/sendData.py",
-					data: {param: 1}
-				}).done(function(o){
-					console.log("python success");
-				}).error(function(o){
-					console.log("python fail");
-				})
+					url: "http://0.0.0.0:9123/data",
+					contentType: 'application/json;charset=UTF-8',
+					data: {
+						'key' : "1"
+					},
+					beforeSend : function(whr){
+						whr.setRequestHeader('X-CSRFToken',csrf_token)
+					}
+				}).done(function( o ) {
+					// do something
+					console.log("success");
+				}).fail(function(o){
+					console.log("fail");
+				});*/
 				TtsService.speak("가이드 영상을 재생합니다.");
 				Focus.change("default");
 			});
