@@ -1,6 +1,6 @@
 {
     "home" : {
-        "commands" : "\"사용가능한 질문\" 이라고 말해보세요.."
+        "commands" : "\"사용 가능한 질문\" 이라고 말해보세요.."
     },
     "traffic" : {
         "time_to" : "Time to {{name}}: "
@@ -44,10 +44,10 @@
         }
     },
     "commands": {
-        "title" : "사용가능한 질문",
+        "title" : "사용 가능한 질문",
         "list": {
-            "text": "사용가능한 질문",
-            "voice": "사용가능한 질문",
+            "text": "사용 가능한 질문",
+            "voice": "사용 가능한 질문",
             "description": "음성인식으로 사용 가능한 질문을 보여줍니다."
         },
         "list-next": {
@@ -219,6 +219,11 @@
             "text": "________항목________에서 제거해줘",
             "voice": "*element항목*project에서 제거해줘",
             "description": "음성인식된 항목을 TODO리스트에서 제거합니다."
+        },
+        "play_video": {
+            "text": "동영상 재생",
+            "voice": "동영상 재생",
+            "description": "가이드 영상을 재생합니다."
         }
     },
     "fitbit": {

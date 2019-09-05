@@ -2,7 +2,7 @@
 (function (angular) {
 	'use strict';
 
-	var language = (typeof config.general.language != 'undefined') ? config.general.language.substring(0, 2).toLowerCase() : 'en';
+	var language = (typeof config.general.language != 'undefined') ? config.general.language.substring(0, 2).toLowerCase() : 'ko';
 
 	angular.module('SmartMirror', ['ngAnimate', 'tmh.dynamicLocale', 'pascalprecht.translate'])
         .config(function (tmhDynamicLocaleProvider) {

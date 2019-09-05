@@ -3,19 +3,25 @@
 
 	function MirrorCtrl(
 		Focus,
+		TtsService,
 		SpeechService,
 		AutoSleepService,
 		LightService,
 		$rootScope, $scope, $timeout, $interval, tmhDynamicLocale, $translate) {
 
+		TtsService.init();
 		// Local Scope Vars
 		var _this = this;
+		var command = COMMANDS.ko;
+		var functionService = FUNCTIONSERVICE;
+		var DEFAULT_COMMAND_TEXT = command.default;
 		$scope.listening = false;
 		$scope.debug = false;
-		$scope.commands = [];
+		$scope.commands = COMMANDS.ko;
 		$scope.partialResult = $translate.instant('home.commands');
 		$scope.layoutName = 'main';
 		$scope.config = config;
+
 
 		// Set up our Focus
 		$rootScope.$on('focus', function (targetScope, newFocus) {
@@ -69,12 +75,12 @@
 				}
 			}
 		});
-
 		//Update the time
 		function updateTime() {
 			$scope.date = new moment();
 
 			// Auto wake at a specific time
+
 			if (typeof config.autoTimer !== 'undefined' && config.autoTimer.mode !== 'disabled' && typeof config.autoTimer.autoWake !== 'undefined' && config.autoTimer.autoWake == moment().format('HH:mm:ss')) {
 				console.debug('Auto-wake', config.autoTimer.autoWake);
 				AutoSleepService.wake()
@@ -101,15 +107,19 @@
 				console.debug("Ok, going to default view...");
 				Focus.change("default");
 			}
+
 			// List commands
 			SpeechService.addCommand('list', function () {
 				console.debug("Here is a list of commands...");
+				console.log("사용가능한질문 입력들어옴");
 				console.log(SpeechService.commands);
 				$scope.commands.commandPage = []
 				$scope.commands.commandPage = SpeechService.getCommands();
 				$scope.commands.index = 0
 				$scope.commands.totalPages = $scope.commands.commandPage.length
 				Focus.change("commands");
+				TtsService.speak("다음은 이용 가능한 메뉴입니다.");
+				//$scope.focus = "commands";
 			});
 
 			SpeechService.addCommand('list-page', function (pageNum) {
@@ -136,6 +146,7 @@
 						$scope.commands.index++
 					}
 				}
+				TtsService.speak("다음 목록 입니다.");
 			})
 
 			// Prev Page
@@ -151,8 +162,26 @@
 			})
 
 			// Go back to default view
-			SpeechService.addCommand('home', defaultView);
+			SpeechService.addCommand('home', function(){
+				console.debug("Ok, going to default view...");
+				Focus.change("default");
+				TtsService.speak("홈으로 이동합니다.")
+			});
 
+			SpeechService.addCommand('play_video',function(){
+				console.debug("가이드 영상을 재생합니다");
+				$.ajax({
+					type: "POST",
+					url: "~/sendData.py",
+					data: {param: 1}
+				}).done(function(o){
+					console.log("python success");
+				}).error(function(o){
+					console.log("python fail");
+				})
+				TtsService.speak("가이드 영상을 재생합니다.");
+				Focus.change("default");
+			});
 			SpeechService.addCommand('debug', function () {
 				console.debug("Boop Boop. Showing debug info...");
 				$scope.debug = true;

@@ -13,7 +13,8 @@ const {ipcRenderer} = require('electron');
             // workaround so we can trigger requests at any time 
 			annyang.isListening = () => { return true }
             // Set lenguage and debug state
-			annyang.setLanguage((typeof config.general.language != 'undefined') ? config.general.language : 'en-US')
+			//annyang.setLanguage((typeof config.general.language != 'undefined') ? config.general.language : 'ko')
+			annyang.setLanguage('ko');
 			annyang.debug(false)
 
             // add specified callback functions
